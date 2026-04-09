@@ -1,0 +1,229 @@
+{
+  "info": {
+    "name": "DDoS Protection System Demo",
+    "description": "Postman collection for demonstrating health checks, normal traffic, DDoS simulation, and live mitigation stats.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Demo Flow",
+      "item": [
+        {
+          "name": "1. Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          }
+        },
+        {
+          "name": "2. Normal Request",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Forwarded-For",
+                "value": "{{normal_ip}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "name": "3. Simulate DDoS Attack",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"target_ip\": \"{{attack_ip}}\",\n  \"requests\": {{attack_requests}},\n  \"min_requests_for_block\": {{min_requests_for_block}}\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/simulate/attack",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "simulate",
+                "attack"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var data = pm.response.json();",
+                  "pm.test('attack simulation completed', function () {",
+                  "  pm.expect(data).to.have.property('allowed');",
+                  "  pm.expect(data).to.have.property('blocked');",
+                  "  pm.expect(data.target_ip).to.eql(pm.collectionVariables.get('attack_ip'));",
+                  "});",
+                  "pm.environment.set('last_attack_allowed', data.allowed);",
+                  "pm.environment.set('last_attack_blocked', data.blocked);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "4. View Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/stats",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "stats"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var data = pm.response.json();",
+                  "var blockedIps = [];",
+                  "(data.recent_detections || []).forEach(function (d) {",
+                  "  if (d.action === 'BLOCKED' && blockedIps.indexOf(d.ip) === -1) {",
+                  "    blockedIps.push(d.ip);",
+                  "  }",
+                  "});",
+                  "var template = `",
+                  "<style>",
+                  "  body { font-family: sans-serif; padding: 16px; }",
+                  "  h2 { color: #c0392b; }",
+                  "  .stat { font-size: 24px; font-weight: bold; color: #2c3e50; }",
+                  "  .blocked { background: #fdecea; padding: 8px 12px; border-radius: 4px; margin: 4px 0; font-weight: bold; }",
+                  "  .ok { color: #27ae60; }",
+                  "  .row { margin-bottom: 10px; }",
+                  "  .label { font-weight: bold; }",
+                  "</style>",
+                  "<h2>DDoS Protection - Live Stats</h2>",
+                  "<div class=\"row\"><span class=\"label\">Blocked IPs:</span> <span class=\"stat\">{{blocked_count}}</span></div>",
+                  "<div class=\"row\"><span class=\"label\">Rate Limited IPs:</span> <span class=\"stat\">{{rate_limited_count}}</span></div>",
+                  "<div class=\"row\"><span class=\"label\">Total Mitigations:</span> <span class=\"stat\">{{total_mitigations}}</span></div>",
+                  "<h3>Blocked IP List</h3>",
+                  "{{#each blocked}}",
+                  "  <div class=\"blocked\">{{this}}</div>",
+                  "{{else}}",
+                  "  <p class=\"ok\">No IPs currently blocked</p>",
+                  "{{/each}}",
+                  "<h3>Recent Detections</h3>",
+                  "{{#each detections}}",
+                  "  <div class=\"blocked\">{{timestamp}} - {{ip}} - {{action}}</div>",
+                  "{{else}}",
+                  "  <p class=\"ok\">No detections yet</p>",
+                  "{{/each}}",
+                  "`;",
+                  "pm.visualizer.set(template, {",
+                  "  blocked_count: data.blocked_ips || 0,",
+                  "  rate_limited_count: data.rate_limited_ips || 0,",
+                  "  total_mitigations: data.total_mitigations || 0,",
+                  "  blocked: blockedIps,",
+                  "  detections: data.recent_detections || []",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5. Simulate Normal Traffic",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requests\": {{normal_requests}}\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/simulate/normal",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "simulate",
+                "normal"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var data = pm.response.json();",
+                  "pm.test('normal simulation completed', function () {",
+                  "  pm.expect(data).to.have.property('allowed');",
+                  "  pm.expect(data).to.have.property('blocked');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://ddos-protection-ketan.eastus.azurecontainer.io:5000"
+    },
+    {
+      "key": "attack_ip",
+      "value": "192.168.1.100"
+    },
+    {
+      "key": "attack_requests",
+      "value": "200"
+    },
+    {
+      "key": "normal_requests",
+      "value": "50"
+    },
+    {
+      "key": "normal_ip",
+      "value": "10.0.0.25"
+    },
+    {
+      "key": "min_requests_for_block",
+      "value": "30"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+# Git and CI
+.git/
+.github/
+
+# Python cache and environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# Local runtime artifacts
+traffic_log.csv
+ddos_protection.log
+training_run_metadata.csv
+
+# IDE/editor
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
