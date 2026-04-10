@@ -1,6 +1,3 @@
-"""
-DDoS Mitigation module for IP blocking and rate limiting.
-"""
 import time
 import threading
 from datetime import datetime
@@ -14,12 +11,6 @@ detection_log = []  # Store last detections for /stats endpoint
 
 
 def block_ip(ip):
-    """
-    Block an IP address by adding it to blocked_ips dict.
-    
-    Args:
-        ip (str): IP address to block
-    """
     global total_mitigations
     with lock:
         blocked_ips[ip] = time.time()
@@ -36,12 +27,6 @@ def block_ip(ip):
 
 
 def rate_limit(ip):
-    """
-    Rate limit an IP address. If request count exceeds threshold, sleep.
-    
-    Args:
-        ip (str): IP address to rate limit
-    """
     global total_mitigations
     with lock:
         if ip not in rate_limited_ips:
@@ -63,24 +48,11 @@ def rate_limit(ip):
 
 
 def is_blocked(ip):
-    """
-    Check if an IP is currently blocked.
-    
-    Args:
-        ip (str): IP address to check
-        
-    Returns:
-        bool: True if IP is blocked, False otherwise
-    """
     with lock:
         return ip in blocked_ips
 
 
 def auto_recover():
-    """
-    Remove IPs from blocked list if they've been blocked for more than 300 seconds (5 min).
-    Called periodically by a background thread.
-    """
     with lock:
         current_time = time.time()
         to_remove = []
@@ -98,13 +70,6 @@ def auto_recover():
 
 
 def get_mitigation_stats():
-    """
-    Get current mitigation statistics.
-    
-    Returns:
-        dict: Statistics including blocked IPs count, rate limited IPs count,
-              total mitigations, and recent detections
-    """
     with lock:
         return {
             'blocked_ips_count': len(blocked_ips),
