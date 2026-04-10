@@ -1,7 +1,3 @@
-"""
-Traffic simulation for DDoS detection model training and testing.
-Generates normal, attack, and suspicious traffic patterns.
-"""
 import requests
 import time
 import random
@@ -26,7 +22,6 @@ parser.add_argument('--suspicious-ips', type=int, default=2,
 args = parser.parse_args()
 BASE_URL = args.url
 
-# Random pool of fake IP addresses
 FAKE_IPS = [f"192.168.{random.randint(0, 255)}.{random.randint(1, 254)}" 
             for _ in range(50)]
 
@@ -68,12 +63,6 @@ def make_request(method, url, ip, endpoint, payload_size, timeout=5):
 
 
 def simulate_normal(n=500):
-    """
-    Simulate normal traffic from many different IPs.
-    
-    Args:
-        n (int): Number of requests to simulate
-    """
     print(f"\n[SIMULATION] Starting NORMAL traffic simulation ({n} requests)...")
     
     for i in range(n):
@@ -105,14 +94,6 @@ def simulate_normal(n=500):
 
 
 def simulate_attack(attacker_ip, n=1000):
-    """
-    Simulate DDoS attack from a single IP.
-    High-frequency requests with large payloads.
-    
-    Args:
-        attacker_ip (str): IP address launching the attack
-        n (int): Number of attack requests
-    """
     print(f"\n[SIMULATION] Starting ATTACK from {attacker_ip} ({n} requests)...")
     
     method = 'GET'
@@ -139,14 +120,6 @@ def simulate_attack(attacker_ip, n=1000):
 
 
 def simulate_suspicious(ip, n=200):
-    """
-    Simulate suspicious traffic pattern.
-    Medium request rate with multiple endpoints.
-    
-    Args:
-        ip (str): IP address with suspicious activity
-        n (int): Number of suspicious requests
-    """
     print(f"\n[SIMULATION] Starting SUSPICIOUS traffic from {ip} ({n} requests)...")
     
     for i in range(n):
@@ -182,12 +155,6 @@ def initialize_traffic_log():
 
 
 def run_simulation():
-    """
-    Run complete traffic simulation.
-    1. Normal traffic
-    2. DDoS attacks from configured attacker IPs
-    3. Suspicious traffic from configured suspicious IPs
-    """
     print("=" * 60)
     print("DDoS TRAFFIC SIMULATION STARTED")
     print("=" * 60)
