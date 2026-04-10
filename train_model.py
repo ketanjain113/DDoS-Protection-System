@@ -1,7 +1,3 @@
-"""
-Model training for DDoS detection.
-Trains and evaluates an SVM model.
-"""
 import os
 from datetime import datetime, timedelta
 import pandas as pd
@@ -16,7 +12,6 @@ from feature_extraction import extract_features, FEATURE_COLUMNS
 
 
 def ensure_training_log_exists(log_path='traffic_log.csv'):
-    """Create synthetic traffic log data if missing, with all 3 classes."""
     if os.path.exists(log_path):
         return
 
