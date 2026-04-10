@@ -1,7 +1,3 @@
-"""
-Feature extraction for DDoS detection.
-Computes features from traffic logs for model training and real-time inference.
-"""
 import pandas as pd
 import numpy as np
 from datetime import datetime
@@ -21,16 +17,6 @@ FEATURE_COLUMNS = [
 
 
 def extract_features(log_path='traffic_log.csv'):
-    """
-    Extract features from traffic log CSV for model training.
-    
-    Args:
-        log_path (str): Path to traffic log CSV file
-        
-    Returns:
-        pd.DataFrame: DataFrame with computed features and label column
-    """
-    # Read the traffic log
     df = pd.read_csv(log_path)
     
     # Convert timestamp to datetime
@@ -111,16 +97,6 @@ def extract_features(log_path='traffic_log.csv'):
 
 
 def get_live_features(ip, request_log):
-    """
-    Compute features for real-time inference from in-memory request log.
-    
-    Args:
-        ip (str): IP address to compute features for
-        request_log (dict): In-memory request log (ip -> list of request dicts)
-        
-    Returns:
-        list: Feature vector in same column order as training
-    """
     if ip not in request_log or len(request_log[ip]) == 0:
         # Return default features for unknown IP
         return [0] * len(FEATURE_COLUMNS)
