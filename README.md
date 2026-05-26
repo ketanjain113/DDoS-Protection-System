@@ -42,7 +42,7 @@ Visit: http://localhost:5000/stats for metrics
 |------|---------|
 | `app.py` | Flask server with DDoS detection middleware |
 | `feature_extraction.py` | Computes 7 ML features per request |
-| `train_model.py` | Trains Random Forest on traffic data |
+| `train_model.py` | Trains SVM on traffic data |
 | `mitigation.py` | IP blocking & rate limiting logic |
 | `simulate_traffic.py` | Generates training data |
 
