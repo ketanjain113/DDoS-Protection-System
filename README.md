@@ -30,7 +30,7 @@ Visit: http://localhost:5000/stats for metrics
 ## ✨ Features
 
 - ⚡ Real-time detection (< 5ms latency)
-- 🤖 Random Forest classifier (95%+ accuracy)
+- 🤖 SVM classifier (95%+ accuracy)
 - 🚫 Automatic IP blocking & rate limiting
 - 📊 REST API for monitoring
 - 🔒 Thread-safe concurrent handling
